@@ -19,7 +19,7 @@ public class FoodEncylopediaController {
     private final FoodEncylopediaService foodEncylopediaService;
 
     @GetMapping
-    public ResponseEntity<?> getAll(@RequestParam(defaultValue = "10") int pageSize,
+    public ResponseEntity<Object> getAll(@RequestParam(defaultValue = "10") int pageSize,
                                     @RequestParam(defaultValue = "1") int pageIndex){
         ResponseObject<Object> responseObject = foodEncylopediaService.getAll(pageSize, pageIndex);
         if(responseObject.getCode() == 200){

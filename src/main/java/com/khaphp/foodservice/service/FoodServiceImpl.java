@@ -8,6 +8,7 @@ import com.khaphp.foodservice.dto.Food.FoodDTOcreate;
 import com.khaphp.foodservice.dto.Food.FoodDTOupdate;
 import com.khaphp.foodservice.dto.Food.UpdateStatusFood;
 import com.khaphp.foodservice.entity.Food;
+import com.khaphp.foodservice.exception.ObjectNotFound;
 import com.khaphp.foodservice.repo.FoodRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +24,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FoodServiceImpl implements FoodService {
+    public static final String SUCCESS_MSG = "Success";
+    public static final String OBJECT_NOT_FOUND_MSG = "object not found";
+    public static final String EXCEPTION_MSG = "Exception: ";
     private final FoodRepository foodRepository;
     private final UserServiceCall userServiceCall;
     private final ModelMapper modelMapper;
@@ -52,7 +56,7 @@ public class FoodServiceImpl implements FoodService {
         }
         objList.forEach(object -> object.setImg(linkBucket + object.getImg()));
         return ResponseObject.builder()
-                .code(200).message("Success")
+                .code(200).message(SUCCESS_MSG)
                 .pageSize(objList.size()).pageIndex(pageIndex).totalPage(totalPage)
                 .data(objList)
                 .build();
@@ -63,7 +67,7 @@ public class FoodServiceImpl implements FoodService {
         try{
             Food object = foodRepository.findById(id).orElse(null);
             if(object == null) {
-                throw new Exception("object not found");
+                throw new ObjectNotFound(OBJECT_NOT_FOUND_MSG);
             }
             object.setImg(linkBucket + object.getImg());
             return ResponseObject.builder()
@@ -74,7 +78,7 @@ public class FoodServiceImpl implements FoodService {
         }catch (Exception e){
             return ResponseObject.builder()
                     .code(400)
-                    .message("Exception: "+ e.getMessage())
+                    .message(EXCEPTION_MSG + e.getMessage())
                     .build();
         }
     }
@@ -84,7 +88,7 @@ public class FoodServiceImpl implements FoodService {
         try{
             UserSystem userSystem = userServiceCall.getObject(object.getEmployeeId());
             if(userSystem == null){
-                throw new Exception("user not found");
+                throw new ObjectNotFound("user not found");
             }
             Food object1 = modelMapper.map(object, Food.class);
             object1.setUpdateDate(new Date(System.currentTimeMillis()));
@@ -94,13 +98,13 @@ public class FoodServiceImpl implements FoodService {
             foodRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
-                    .message("Success")
+                    .message(SUCCESS_MSG)
                     .data(object1)
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()
                     .code(400)
-                    .message("Exception: " + e.getMessage())
+                    .message(EXCEPTION_MSG + e.getMessage())
                     .build();
         }
     }
@@ -110,7 +114,7 @@ public class FoodServiceImpl implements FoodService {
         try{
             Food object1 = foodRepository.findById(object.getId()).orElse(null);
             if(object1 == null) {
-                throw new Exception("object not found");
+                throw new ObjectNotFound(OBJECT_NOT_FOUND_MSG);
             }   // name unit stoc, price, sale location
             object1.setName(object.getName());
             object1.setUnit(object.getUnit());
@@ -122,12 +126,12 @@ public class FoodServiceImpl implements FoodService {
             foodRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
-                    .message("Success")
+                    .message(SUCCESS_MSG)
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()
                     .code(400)
-                    .message("Exception: " + e.getMessage())
+                    .message(EXCEPTION_MSG + e.getMessage())
                     .build();
         }
     }
@@ -137,7 +141,7 @@ public class FoodServiceImpl implements FoodService {
         try{
             Food object = foodRepository.findById(id).orElse(null);
             if(object == null) {
-                throw new Exception("object not found");
+                throw new ObjectNotFound(OBJECT_NOT_FOUND_MSG);
             }
             if(!object.getImg().equals(logoName)){
                 fileStore.deleteImage(object.getImg());
@@ -147,12 +151,12 @@ public class FoodServiceImpl implements FoodService {
             foodRepository.save(object);
             return ResponseObject.builder()
                     .code(200)
-                    .message("Success")
+                    .message(SUCCESS_MSG)
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()
                     .code(400)
-                    .message("Exception: " + e.getMessage())
+                    .message(EXCEPTION_MSG + e.getMessage())
                     .build();
         }
     }
@@ -162,18 +166,18 @@ public class FoodServiceImpl implements FoodService {
         try{
             Food object = foodRepository.findById(object1.getId()).orElse(null);
             if(object == null) {
-                throw new Exception("object not found");
+                throw new ObjectNotFound(OBJECT_NOT_FOUND_MSG);
             }
             object.setStatus(object1.getStatus());
             foodRepository.save(object);
             return ResponseObject.builder()
                     .code(200)
-                    .message("Success")
+                    .message(SUCCESS_MSG)
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()
                     .code(400)
-                    .message("Exception: " + e.getMessage())
+                    .message(EXCEPTION_MSG + e.getMessage())
                     .build();
         }
     }
@@ -183,7 +187,7 @@ public class FoodServiceImpl implements FoodService {
         try{
             Food object = foodRepository.findById(id).orElse(null);
             if(object == null) {
-                throw new Exception("object not found");
+                throw new ObjectNotFound(OBJECT_NOT_FOUND_MSG);
             }
             if(!object.getImg().equals(logoName)){
                 fileStore.deleteImage(object.getImg());
@@ -192,12 +196,12 @@ public class FoodServiceImpl implements FoodService {
             foodRepository.delete(object);
             return ResponseObject.builder()
                     .code(200)
-                    .message("Success")
+                    .message(SUCCESS_MSG)
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()
                     .code(400)
-                    .message("Exception: " + e.getMessage())
+                    .message(EXCEPTION_MSG + e.getMessage())
                     .build();
         }
     }
