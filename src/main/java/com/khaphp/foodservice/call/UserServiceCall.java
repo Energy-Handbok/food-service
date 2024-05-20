@@ -19,24 +19,41 @@ public class UserServiceCall {
     private final UserServiceFeignClient userServiceFeignClient;
     private final CircuitBreakerFactory circuitBreakerFactory;
     public UserSystem getObject(String id) {
-        UserSystem userSystem = (UserSystem) circuitBreakerFactory.create("getdetail").run(
+        return (UserSystem) circuitBreakerFactory.create("getdetail").run(
                 () -> {
                     log.info("[getObject]" + CALL_OTHER_SERVICE);
                     ResponseEntity<?> responseEntity = userServiceFeignClient.getObject(id);
-                    log.info("response: " + responseEntity);
-                    LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseEntity.getBody();
-                    UserSystem user = null;
-                    try {
-                        user = UserSystem.linkedHashMapToEntity((LinkedHashMap<String, Object>) data.get("data"));
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return user;
+                    log.info("response [getObject]: " + responseEntity);
+                    return getUserFromResponse(responseEntity);
                 },
                 throwable -> {
                     log.error("[getObject]" + CALL_OTHER_SERVICE_ERROR, throwable.getMessage());
                     return null;
                 });
-        return userSystem;
+    }
+
+    private UserSystem getUserFromResponse(ResponseEntity<?> responseEntity) {
+        UserSystem user = null;
+        LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseEntity.getBody();
+        try {
+            user = UserSystem.linkedHashMapToEntity((LinkedHashMap<String, Object>) data.get("data"));
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+    public UserSystem getDetailByEmail(String email){
+        return (UserSystem) circuitBreakerFactory.create("getdetailByEmail").run(
+                () -> {
+                    log.info("[getDetailByEmail]" + CALL_OTHER_SERVICE);
+                    ResponseEntity<?> responseEntity = userServiceFeignClient.getObjectByEmail(email);
+                    log.info("response [getDetailByEmail]: " + responseEntity);
+                    return getUserFromResponse(responseEntity);
+                },
+                throwable -> {
+                    log.error("[getDetailByEmail]" + CALL_OTHER_SERVICE_ERROR, throwable.getMessage());
+                    return null;
+                });
     }
 }
