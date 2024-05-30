@@ -1,23 +1,23 @@
-package com.khaphp.foodservice.dto.Food;
+package com.khaphp.common.dto.food;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class FoodDTOupdate {
+@ToString
+public class FoodDTOupdate implements Serializable {
     private String id;
     @Size(min=1, max=255, message = "name length from 1 to 255")
     private String name;
     @Size(min=1, max=50, message = "unit length from 1 to 50")
     private String unit;
-    @Min(value = 0, message = "stock must be greater or equal 0")
+    @Min(value = 1, message = "stock must be greater than 0")
     private float stock;
     @Min(value = 1, message = "price must be greater than 0")
     private float price;
